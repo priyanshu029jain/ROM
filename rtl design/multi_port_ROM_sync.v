@@ -22,29 +22,29 @@ module multi_port_ROM_sync #(
       begin
         case (addr[i*addr_width +: addr_width])
           3'b000 :
-            data[i*data_width +: data_width] = 8'hA5;
+            data[i*data_width +: data_width] <= 8'hA5;
           3'b001 :
-            data[i*data_width +: data_width] = 8'h12;
+            data[i*data_width +: data_width] <= 8'h12;
           3'b010 :
-            data[i*data_width +: data_width] = 8'hFF;
+            data[i*data_width +: data_width] <= 8'hFF;
           3'b011 :
-            data[i*data_width +: data_width] = 8'h00;
+            data[i*data_width +: data_width] <= 8'h00;
           3'b100 :
-            data[i*data_width +: data_width] = 8'h55;
+            data[i*data_width +: data_width] <= 8'h55;
           3'b101 :
-            data[i*data_width +: data_width] = 8'hC3;
+            data[i*data_width +: data_width] <= 8'hC3;
           3'b110 :
-            data[i*data_width +: data_width] = 8'h3B;
+            data[i*data_width +: data_width] <= 8'h3B;
           3'b111 :
-            data[i*data_width +: data_width] = 8'h7E;
+            data[i*data_width +: data_width] <= 8'h7E;
           default :
-            data[i*data_width +: data_width] = 8'h00;
+            data[i*data_width +: data_width] <= 8'h00;
         endcase
       end
     end
     else
     begin
-      data = {data_bites{1'b0}};
+      data <= {data_bites{1'b0}};
     end
   end
 
