@@ -1,7 +1,7 @@
 
 module testbench;
   reg cs, rd_en, clk;
-  reg [2:0] addr1, addr2, addr3, addr4;
+  reg [4:0] addr1, addr2, addr3, addr4;
   wire [7:0] data1, data2, data3, data4;
 
 
@@ -9,8 +9,8 @@ module testbench;
         .clk(clk),
         .rd_en (rd_en),
         .cs (cs),
-        .addr({addr1,addr2,addr3,addr4}),
-        .data({data1,data2,data3,data4})
+        .address_vector({addr1,addr2,addr3,addr4}),
+        .data_vector({data1,data2,data3,data4})
         // .addr2(addr2),
         // .data2(data2)
       );
@@ -31,10 +31,10 @@ module testbench;
     clk = 1'b0;
     cs = 1'b1;
     rd_en = 1'b0;
-    addr1 = 3'b000;
-    addr2 = 3'b000;
-    addr3 = 3'b000;
-    addr4 = 3'b000;
+    addr1 = 5'b0;
+    addr2 = 5'b0;
+    addr3 = 5'b0;
+    addr4 = 5'b0;
   end
 
   initial
@@ -43,25 +43,26 @@ module testbench;
 
     #10 rd_en = 1'b1;
 
-    #10 addr1 = 3'b010;
-    addr2 = 3'b100;
-    addr3 = 3'b011;
-    addr4 = 3'b001;
+    #10 addr1 = 5'b01000;
+    addr2 = 5'b10001;
+    addr3 = 5'b01100;
+    addr4 = 5'b00110;
 
-    #10 addr1 = 3'b101;
-    addr2 = 3'b011;
-    addr3 = 3'b001;
-    addr4 = 3'b111;
+    #10 addr1 = 5'b00101;
+    addr2 = 5'b00011;
+    addr3 = 5'b00101;
+    addr4 = 5'b00111;
 
-    #10 addr1 = 3'b001;
-    addr2 = 3'b111;
-    addr3 = 3'b100;
-    addr4 = 3'b011;
+    #10 addr1 = 5'b00001;
+    addr2 = 5'b11111;
+    addr3 = 5'b10001;
+    addr4 = 5'b01100;
 
-    #10 addr1 = 3'b110;
-    addr2 = 3'b010;
-    addr3 = 3'b010;
-    addr4 = 3'b100;
+    #10 addr1 = 5'b11011;
+    addr2 = 5'b01000;
+    addr3 = 5'b01011;
+    addr4 = 5'b10010;
+
 
     #20 $finish;
   end
