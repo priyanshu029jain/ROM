@@ -1,21 +1,23 @@
 
 module testbench;
-  reg cs, rd_en, clk;
+  reg cs, rd, clk, rst;
   reg [4:0] addr1, addr2, addr3, addr4;
   wire [7:0] data1, data2, data3, data4;
-
+  wire ready;
 
   ROM dut (
         .clk(clk),
-        .rd_en (rd_en),
+        .rd(rd),
         .cs (cs),
+        .rst_n(rst),
         .address_vector({addr1,addr2,addr3,addr4}),
-        .data_vector({data1,data2,data3,data4})
+        .data_vector({data1,data2,data3,data4}),
+        .ready(ready)
         // .addr2(addr2),
         // .data2(data2)
       );
 
-  localparam CLK_PERIOD = 10;
+  localparam CLK_PERIOD = 6;
   always #(CLK_PERIOD/2) clk = ~clk;
 
   //dumping the variables
@@ -30,7 +32,8 @@ module testbench;
   begin
     clk = 1'b0;
     cs = 1'b1;
-    rd_en = 1'b0;
+    rd = 1'b0;
+    rst = 1'b1;
     addr1 = 5'b0;
     addr2 = 5'b0;
     addr3 = 5'b0;
@@ -39,9 +42,10 @@ module testbench;
 
   initial
   begin
-    $monitor("%0t\t%b\t%b\t%b\t%h\t%b\t%h\t%b\t%h\t%b\t%h", $time, cs, rd_en, addr1, data1, addr2, data2, addr3, data3, addr4, data4);
-
-    #10 rd_en = 1'b1;
+    $monitor("%0t\t%b\t%b\t%b\t%b\t%h\t%b\t%h\t%b\t%h\t%b\t%h\t%b", $time, rst, cs, rd, addr1, data1, addr2, data2, addr3, data3, addr4, data4, ready);
+    
+    #5 rst = 1'b0;
+    #5 rd = 1'b1;
 
     #10 addr1 = 5'b01000;
     addr2 = 5'b10001;
