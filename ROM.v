@@ -42,7 +42,7 @@ module ROM #(
 
   /// Initialize ROM from external storage
   initial
-  begin
+  begin : initializing_ROM
     $readmemh(`FILE, mem_array, 0 ,RAM_BLOCKS -1);
   end
 
@@ -54,8 +54,8 @@ module ROM #(
     reg [block_width-1:0]    block;
     reg [block_no_width-1:0] block_no;
     reg [offset_width-1:0]   block_offset;
-    begin
-      if(read) begin
+    begin : drive_data
+      if(read) begin : rd_eachPort
       // derive block number and offset
       block_no     = addr[address_width-1 : offset_width];
       block_offset = addr[offset_width-1 : 0];
@@ -66,14 +66,14 @@ module ROM #(
       // slice out the word
       d_out = block[block_offset * data_width +: data_width];
       end 
-      else d_out = {data_width{1'bz}};
+      else d_out = {data_width{1'b0}};
     end
   endfunction
 
   //FSM sequential logic
   always @(posedge clk)
-  begin
-    if(rst_n)
+  begin : state_logic
+    if(!rst_n)
       current_state <= idle_state;
     else
       current_state <= next_state;
@@ -82,7 +82,7 @@ module ROM #(
   //FSM Combinational logic
   integer i;
   always @(*)
-  begin
+  begin : states_execution
     //passing the default values
     data_vector = {data_vector_width{1'b0}};
     ready = 1'b0;
@@ -90,23 +90,23 @@ module ROM #(
 
     case(current_state)
       idle_state :
-      begin
+      begin : idle
         if( |rd && cs)
           next_state = fetch_state; // Request accepted, jump to fetch
       end
 
       fetch_state :
-      begin
+      begin : fetch
         //Its purpose is to deliberately delay your hardware control pipeline by one or more clock cycles 
         //to match the physical access latency of the memory cell array
         next_state = read_state; 
       end
 
       read_state :
-      begin
+      begin : read
         for (i = 0; i < PORTS; i = i + 1)
         begin
-          data_vector[i*data_width +: data_width] <= d_out(address_vector[i*address_width +: address_width], rd[i]); //drevie data out from all ports 
+          data_vector[i*data_width +: data_width] = d_out(address_vector[i*address_width +: address_width], rd[i]); //drevie data out from all ports 
         end
 
         next_state = ( |rd && cs) ? fetch_state : idle_state; // Pipeline directly into the next read or standby mode
@@ -116,7 +116,6 @@ module ROM #(
         next_state = idle_state;
     endcase
   end
-
-
+  
 endmodule
 

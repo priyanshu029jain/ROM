@@ -39,7 +39,7 @@ module ROM #(
 
     else
     begin
-      data = {data_bites{1'b0}};
+      data <= {data_bites{1'b0}};
     end
   end
 

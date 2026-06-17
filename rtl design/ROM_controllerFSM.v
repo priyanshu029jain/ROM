@@ -66,7 +66,7 @@ module ROM_controllerFSM #(
   //FSM sequential logic
   always @(posedge clk)
   begin
-    if(rst_n)
+    if(!rst_n)
       current_state <= idle_state;
     else
       current_state <= next_state;
@@ -97,7 +97,7 @@ module ROM_controllerFSM #(
       begin
         for (i = 0; i < PORTS; i = i + 1)
         begin
-          data_vector[i*data_width +: data_width] <= d_out(address_vector[i*address_width +: address_width]);
+          data_vector[i*data_width +: data_width] = d_out(address_vector[i*address_width +: address_width]);
         end
 
         next_state = (rd && cs) ? fetch_state : idle_state;
