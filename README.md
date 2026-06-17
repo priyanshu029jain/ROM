@@ -83,12 +83,12 @@ This section provides a high-level structural overview of the active cores avail
 
 ### 1. Baseline Primitives
 
-#### 🔹 [Single-Port ROM (`single_port_ROM.v`)](../module%20markdown/single_port_ROM.md)
+#### 🔹 [Single-Port ROM (`single_port_ROM.v`)](./module%20markdown/single_port_ROM.md)
 
 * **Description:** A baseline, 1-port asynchronous lookup cell that maps flat inputs to static data outputs instantly without sequential logic overhead.
 * **Interface Profile:** Asynchronous, Single Address, Single Data Port.
 
-#### 🔹 [Dual-Port ROM (`dual_port_ROM.v`)](../module%20markdown/single_port_ROM.md) *(Uses matching layout primitives)*
+#### 🔹 [Dual-Port ROM (`dual_port_ROM.v`)](./module%20markdown/single_port_ROM.md) *(Uses matching layout primitives)*
 
 * **Description:** Implements two completely independent parallel combinational read ports, allowing two separate bus master nodes to query the same memory array concurrently without structural hazards.
 * **Interface Profile:** Dual Asynchronous Address Inputs, Dual Data Outputs.
@@ -97,17 +97,17 @@ This section provides a high-level structural overview of the active cores avail
 
 ### 2. Packed Vector Cores
 
-#### 🔹 [Combinational Multi-Port ROM (`multi_port_ROM.v`)](../module%20markdown/multi_port_ROM.md)
+#### 🔹 [Combinational Multi-Port ROM (`multi_port_ROM.v`)](./module%20markdown/multi_port_ROM.md)
 
 * **Description:** Packs all parallel port lines into uniform, high-density vector rows. Uses an unclocked combinational block (`always @(*)`) and blocking assignments to achieve simultaneous multi-channel lookups with zero clock-cycle propagation delay.
 * **Interface Profile:** `PORTS`-scaled packed address input and data output rails.
 
-#### 🔹 [Synchronous Multi-Port ROM (`multi_port_ROM_sync.v`)](../module%20markdown/multi_port_ROM_sync.md)
+#### 🔹 [Synchronous Multi-Port ROM (`multi_port_ROM_sync.v`)](./module%20markdown/multi_port_ROM_sync.md)
 
 * **Description:** A synchronously registered multi-channel lookup block. It samples the entire packed vector address bus on the positive edge of the clock (`always @(posedge clk)`) and drives clean, glitch-free data outputs through registered multiplexer trees.
 * **Interface Profile:** Synchronous clocked execution, packed address/data vectors.
 
-#### 🔹 [Multi-Word Block ROM (`ROM_multiWords.v`)](../module%20markdown/ROM_multiWords.md)
+#### 🔹 [Multi-Word Block ROM (`ROM_multiWords.v`)](./module%20markdown/ROM_multiWords.md)
 
 * **Description:** Moves away from a flat index layout to mimic a high-performance **cache line structure**. The internal logic uses a hardware function (`d_out`) to parse flat addresses into distinct block numbers and local word offsets, slicing out data using indexed part-selects (`+:`).
 * **Interface Profile:** Parameterized `BLOCK_SIZE` and `WORD_SIZE` configuration vectors.
@@ -116,29 +116,15 @@ This section provides a high-level structural overview of the active cores avail
 
 ### 3. FSM-Managed Subsystems
 
-#### 🔹 [Basic ROM Controller FSM (`ROM_controllerFSM.v`)](../module%20markdown/ROM_controllerFSM.md)
+#### 🔹 [Basic ROM Controller FSM (`ROM_controllerFSM.v`)](./module%20markdown/ROM_controllerFSM.md)
 
 * **Description:** Integrates a basic 2-process Finite State Machine (FSM) over the block memory core to regulate data path setup delays. It transitions through a structured pipeline to guarantee signal stabilization before declaring data valid.
 * **Interface Profile:** Synchronous state routing, single `rd` strobe, handshaking `ready` bit.
 
-#### 🔹 [Master FSM Multi-Port ROM (`ROM.v`)](../ROM.md) *(Master Design Core)*
+#### 🔹 [Master FSM Multi-Port ROM (`ROM.v`)](./ROM.md) *(Master Design Core)*
 
 * **Description:** The most advanced subsystem core in the toolkit. It combines full cache-line address parsing (`d_out`), high-density packed vector buses, and a multi-channel active-low reset layout (`!rst_n`). An OR-reduction routing check (`|rd`) evaluates whether *any* channel is active, stalling the pipeline in `FETCH_STATE` for precisely one clock cycle to mimic physical memory charge settlement latencies before safely outputting stable data.
 * **Interface Profile:** Complete interface including per-port `rd` bits, active-low reset, master `ready` handshake, and parameterized multi-word block tracking.
-
-### 🔌 Standardized I/O Pin Boundary Signals
-
-The core IP blocks manage external module handshaking and interface routing using the following standardized pin mapping configurations:
-
-| Port Name | Direction | Data Type | Description |
-| :--- | :---: | :---: | :--- |
-| `clk` | Input | `wire` | Master global system clock driving internal FSM sequential transitions on its rising edge. |
-| `rst_n` | Input | `wire` | Master asynchronous/synchronous system reset line conforming to standard active-low convention. |
-| `cs` | Input | `wire` | Active-high Chip Select validation line used to activate the internal look-up matrix or controller matrix. |
-| `rd` | Input | `wire [PORTS-1:0]` | Parallel array of independent active-high Read Enable lines tracking incoming transaction requests per port channel. |
-| `address_vector` | Input | `wire [address_vector_width-1:0]` | **Vectorized Input Bus:** High-density packed vector grouping parallel port address coordinates side-by-side. |
-| `ready` | Output | `reg` | Synchronous handshake validation strobe confirming that target data has settled and is completely stable on the output rail. |
-| `data_vector` | Output | `reg [data_vector_width-1:0]` | **Vectorized Output Bus:** High-density packed destination register vector delivering all decoded multi-channel words simultaneously. |
 
 ## 🕹️ Deep-Dive: Why an FSM Memory Controller?
 
