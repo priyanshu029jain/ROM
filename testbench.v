@@ -1,11 +1,12 @@
 
 module testbench;
-  reg cs, rd_en;
+  reg cs, rd_en, clk;
   reg [2:0] addr1, addr2, addr3, addr4;
   wire [7:0] data1, data2, data3, data4;
 
 
   ROM dut (
+        .clk(clk),
         .rd_en (rd_en),
         .cs (cs),
         .addr({addr1,addr2,addr3,addr4}),
@@ -14,8 +15,8 @@ module testbench;
         // .data2(data2)
       );
 
-  // localparam CLK_PERIOD = 10;
-  // always #(CLK_PERIOD/2) clk=~clk;
+  localparam CLK_PERIOD = 10;
+  always #(CLK_PERIOD/2) clk = ~clk;
 
   //dumping the variables
   initial
@@ -27,6 +28,7 @@ module testbench;
   //initial values
   initial
   begin
+    clk = 1'b0;
     cs = 1'b1;
     rd_en = 1'b0;
     addr1 = 3'b000;

@@ -1,10 +1,10 @@
 
-module multi_port_ROM #(
+module multi_port_ROM_sync #(
     parameter data_width = 8,
     parameter memory_size = 8,
     parameter ports = 4
-  ) (
-    input cs, rd_en,
+  ) ( 
+    input clk, cs, rd_en,
     input [addr_bites -1:0] addr,// one addr_vector containg the addr of all ports
     output reg [data_bites -1:0] data // contain the data coming out of all ports
   );
@@ -13,9 +13,8 @@ module multi_port_ROM #(
   localparam addr_bites = ports * addr_width;
   localparam data_bites = ports * data_width;
 
-  
   integer i;
-  always @(*)
+  always @(posedge clk)
   begin
     if ({cs, rd_en} == 2'b11)
     begin
