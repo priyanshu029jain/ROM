@@ -1,13 +1,14 @@
 
 module testbench;
-  reg cs, rd, clk, rst;
+  reg cs, clk, rst;
+  reg rd1,rd2,rd3,rd4;
   reg [4:0] addr1, addr2, addr3, addr4;
   wire [7:0] data1, data2, data3, data4;
   wire ready;
 
   ROM dut (
         .clk(clk),
-        .rd(rd),
+        .rd({rd1,rd2,rd3,rd4}),
         .cs (cs),
         .rst_n(rst),
         .address_vector({addr1,addr2,addr3,addr4}),
@@ -32,7 +33,10 @@ module testbench;
   begin
     clk = 1'b0;
     cs = 1'b1;
-    rd = 1'b0;
+    rd1 = 1'b0;
+    rd2 = 1'b0;
+    rd3 = 1'b0;
+    rd4 = 1'b0;
     rst = 1'b1;
     addr1 = 5'b0;
     addr2 = 5'b0;
@@ -42,10 +46,10 @@ module testbench;
 
   initial
   begin
-    $monitor("%0t\t%b\t%b\t%b\t%b\t%h\t%b\t%h\t%b\t%h\t%b\t%h\t%b", $time, rst, cs, rd, addr1, data1, addr2, data2, addr3, data3, addr4, data4, ready);
+    $monitor("%0t\t%b\t%b  \t%b\t%b\t%h   \t%b\t%b\t%h   \t%b\t%b\t%h   \t%b\t%b\t%h  \t%b", $time,rst,cs,  rd1,addr1,data1,   rd2,addr2,data2,   rd3,addr3,data3,   rd4,addr4,data4,   ready);
     
     #5 rst = 1'b0;
-    #5 rd = 1'b1;
+    #5 {rd1,rd2,rd3,rd4} = 4'b1010;
 
     #10 addr1 = 5'b01000;
     addr2 = 5'b10001;
@@ -56,6 +60,8 @@ module testbench;
     addr2 = 5'b00011;
     addr3 = 5'b00101;
     addr4 = 5'b00111;
+
+    #5 {rd1,rd2,rd3,rd4} = 4'b0101;
 
     #10 addr1 = 5'b00001;
     addr2 = 5'b11111;
